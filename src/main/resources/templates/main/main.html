@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="title" content="가축질병대응 AI-MRCQA">
+	<title>가축질병대응 AI-MRCQA</title>
+	<link rel="stylesheet" type="text/css" href="/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/css/content.css">
+	<link rel="stylesheet" type="text/css" href="/css/components.css">
+	<link rel="stylesheet" type="text/css" href="/css/chat.css">
+	<link rel="stylesheet" type="text/css" href="/css/popup.css">
+	<script type="text/javascript" src="/js/jquery/jquery-3.6.0.min.js"></script>
+	<script type="text/javascript" src="/pdf/pdfobject.min.js"></script>
+	<script src="/js/layouts.js"></script>
+	<script src="/js/popup.js"></script>
+	<script src="/js/chat.js"></script>
+	<script> 
+		window.onload = function (){
+			//$("#div_load_image").hide();
+		}
+		
+		var qstIdx = 0;	
+		var ansIdx = 0;
+		
+		var ansParamMap = [];
+		var ansMrcResult = [];
+		var ansMrcParagraphSources = [];
+		var ansDocResultSources = [];
+		var distAnsDocResultSources = [];
+		var ansDocResultSourcesUnique = [];
+		var ansDocResultHitHits = [];
+		var ansDocDiv = [];
+		var ansDocKeywordSources = [];
+		
+		var ansTypeArr = ['pdf', 'article', 'guide'];
+		var ansSearchInfo = [];
+		
+		ansParagraphSources = [];
+		
+	</script>
+</head>
+<body>
+<!-- <div id="div_load_image" style="position:absolute; top:50%; left:50%; width:0px; height:0px; z-index:9999; background:#f0f0f0; filter:alpha(opacity=50); opacity:alpha*0.5; margin:auto; padding:0; text-align:center"> <img src="/img/loading.gif" style="width:100px; height:100px;"> </div> -->
+<div id="div_load_image" style="position:absolute; top:0; width:100%; height:100%; z-index:9999; background:black; opacity:0.5; margin:auto; padding:0; text-align:center; display: none;">
+	<img src="/img/loading.gif" style="position:absolute; width:100px; height:100px; top:50%;">
+</div>
+<div class="wrap">
+  <!-- 질의응답 영역 -->
+  <div class="chat-wrap">
+    <div class="chat-header">
+      <p>가축질병대응 AI-MRCQA</p>
+      <!-- 버튼 : 대화내역 초기화 -->
+      <button type="reset" class="btn-reset"><img src="/img/btn_reset.png" alt="초기화"/></button>
+    </div>
+    <div class="chat-content">
+      <div class="chat">
+        <ul>
+          <li class="left">
+            <div class="bots">
+              <p>무엇을 도와드릴까요?</p>
+            </div>
+          </li>
+          <!-- <li class="right">
+            <div class="user">
+              <p>[답변유형 : 전체 / 답변연도 : 전체]<br>
+                2014년 7~8월에 우리나라에서 발생한 구제역의 오염경로를 추정해본 결과는?
+              </p>
+            </div>
+          </li>
+          <li class="left">
+            <div class="bots">
+              <p>2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입 되었을 가능성이 가장 높습니다.</p>
+              <button type="button" class="chat-doc" onclick="layout()">관련문서보기</button>
+              <a>★ 의견 및 평점 남기기</a>
+            </div>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+    <div class="chat-footer">
+      <!-- 질문입력 폼 -->
+      <form id="qstForm" method="post" action="/qna/getResult">
+        <label>답변유형</label>
+        <select name="type" class="dropdown" id="ansType">
+            <option value="all">전체</option>
+            <option value="pdf">백서(PDF)</option>
+            <option value="article">뉴스(기사)</option>
+            <option value="guide">기관 공고</option>
+        </select>
+        <input type="radio" name="searchType" value="simple" class="radioBtn" checked="checked"><label for="simple">간편검색</label>
+        <input type="radio" name="searchType" value="exact" class="radioBtn radio-alert"><label for="exact">정밀검색</label>
+        <button type="button" class="btn-tooltip"><img src="img/btn_tooltip.png"></button>
+        <textarea name="quiz" placeholder="질문을 입력해주세요." class="input-chat" id="qstText"></textarea>
+        <button type="button" class="btn-submit" id="chat-action">입력</button>
+      </form>
+      <!-- //질문입력 폼 -->
+    </div>
+  </div>
+  <!-- // 질의응답 영역 -->
+  <!-- 답변 및 출력 영역 -->
+  <div class="container">
+    <div class="content">
+      <div>
+        <div class="doc">
+          <!-- 유동 탭  -->
+          <div class="tab-doc">
+            <ul>
+              <!-- <li class="tab-doc-on">
+                <a>관련문서-1</a><button type="button" class="btn-tab-close">&nbsp;</button>
+              </li>
+              <li class="tab-doc-off">
+                <a>관련문서-2</a><button type="button" class="btn-tab-close">&nbsp;</button>
+              </li> -->
+            </ul>
+          </div>
+          <!-- // 유동 탭 -->
+          <div class="info">
+            <ul>
+              <li><a class="info-update">정보수정</a></li>
+              <li><a href="/login/logoutProc">로그아웃</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="box left">
+          <!-- 1. 질문답변 보여주는 영역-->
+          <div class="box01">
+            <button type="button" class="btn-open" onclick="box01()">열기 <span class="more">▼</span></button>
+            <button type="button" class="btn-close" onclick="box01()">닫기 <span class="more">▲</span></button>
+            <h1 class="box-title">질의응답 요약<span class="box-title-ex">(질문 내용과 해당하는 가장 상위 SCORE 답변 문장이 표기됩니다.)</span></h1>
+            <!-- 질의응답 내용 -->
+            <div class="list-smry" id="ans-smry">
+              <!-- <ul>
+                <li>
+                  <span>답변유형</span><a>전체</a><span>답변연도</span><a>전체</a>
+                </li>
+                <li>
+                  <span>질문</span><a>2014년 7~8월에 우리나라에서 발생한 구제역의 오염경로를 추정해본 결과는 무엇인가?</a>
+                </li>
+                <li>
+                  <span>답변</span><a>2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입 되었을 가능성이 가장 높습니다.</a>
+                </li>
+              </ul> -->
+              <p class="box-default" id="ans-smry-default">답변 문서가 없습니다.</p>
+            </div>
+          </div>
+          <!-- // 1. 질문답변 보여주는 영역-->
+          <!-- 2. 문서내용 보여주는 영역 -->
+          <div class="box02">
+            <h1 class="box-title">답변 리스트</h1>
+            <p class="box-default" id="ans-doc-smry-default">답변 문서가 없습니다.</p>
+            <!-- 문서 내용 -->
+            <div class="list-smry" id="ans-list-div" style="display: none;">
+              <button type="button" class="btn-search" id="continue-search" onclick="getMoreResult()">계속해서 검색하기</button>
+              <ul>
+                <li>
+                  <span>답변 :</span><a id="ansCnt">20</a><span>연관문서 :</span><a id="ansDocCnt">20</a><span>MAX Score :</span><a id="ansMaxScore">74.54</a>
+                </li>
+                <li>
+                  <h3>※ SCORE가 낮다면, 계속해서 검색해보세요. 정확한 답변의 평균 SCORE는 90 전후입니다.</h3>
+                </li>
+              </ul>
+              <div class="answerlist">
+                <!-- <table class="table-answer"> -->
+                  <!-- <tr>
+                      <td>
+                        <div class="answer-left">
+                          <ul>
+                            <li><a class="answer-score">SCORE : 74.54</a></li>
+                            <li class="answer-txt">2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입되었을 가능성이 가장 높습니다.</li>
+                            <li class="answer-info">문서제목 : 2014/2015 구제역 Foot-and-Mouth Disease 역학조사분석보고서</li>
+                            <li class="answer-info">발행기관 : 검역본부 / 발행일자 : 2015년 12월</li>
+                          </ul>
+                        </div>
+                        <div class="answer-right">
+                          <ul>
+                            <li><button type="button" class="btn-mini btn-doc">원문보기</button></li>
+                          </ul>
+                        </div>
+                      </td>
+                  </tr> -->
+                  <!-- <tr>
+                    <td>
+                      <div class="answer-left">
+                        <ul>
+                          <li><a class="answer-score">SCORE : 72.12</a></li>
+                          <li class="answer-txt">2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입되었을 가능성이 가장 높습니다. 그리고 역학적 상황 등을 분석하면 러시아 역학적 상황 등을 분석하면 러시아 우리나라로요.</li>
+                          <li class="answer-info">문서제목 : 2014/2015 구제역 Foot-and-Mouth Disease 역학조사분석보고서</li>
+                          <li class="answer-info">발행기관 : 검역본부 / 발행일자 : 2015년 12월</li>
+                        </ul>
+                      </div>
+                      <div class="answer-right">
+                        <ul>
+                          <li><button type="button" class="btn-mini">의견 및 평점</button></li>
+                          <li><button type="button" class="btn-mini">원문보기</button></li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                      <td>
+                        <div class="answer-left">
+                          <ul>
+                            <li><a class="answer-score">SCORE : 54.54</a></li>
+                            <li class="answer-txt">2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입되었을 가능성이 가장 높습니다.</li>
+                            <li class="answer-info">문서제목 : 2014/2015 구제역 Foot-and-Mouth Disease 역학조사분석보고서</li>
+                            <li class="answer-info">발행기관 : 검역본부 / 발행일자 : 2015년 12월</li>
+                          </ul>
+                        </div>
+                        <div class="answer-right">
+                          <ul>
+                            <li><button type="button" class="btn-mini">의견 및 평점</button></li>
+                            <li><button type="button" class="btn-mini">원문보기</button></li>
+                          </ul>
+                        </div>
+                      </td>
+                  </tr> -->
+                <!-- </table> -->
+                <!-- 페이지넘버 -->
+                <!-- 
+                <div class="page-num mt-15 mb-5">
+                  <div class="inner">
+                    <li><a href="#" class="btn-prev-first">◀◀</a></li>
+                    <li><a href="#" class="btn-prev">◀</a></li>
+                    <li>
+                      <a href="#" class="current">1</a>
+                      <a href="#">2</a>
+                      <a href="#">3</a>
+                      <a href="#">4</a>
+                      <a href="#">5</a>
+                      <a href="#">...</a>
+                    </li>
+                    <li><a href="#" class="btn-next">▶</a></li>
+                    <li><a href="#" class="btn-next-end">▶▶</a></li>
+                  </div>
+                </div>
+                 -->
+              </div>
+            </div>
+            
+            <!-- <div class="list-smry" id="ans-doc-smry" style="display: none;">
+              <button type="button" class="btn-download" style="display: none;">원문보기</button>
+              <ul>
+              </ul>
+              <div class="pdfbox">
+              	<div id="pdfboxDiv" style="width: 100%; height: 100%;">
+              	</div>
+              </div>
+            </div> -->
+          </div>
+          <!-- //2. 문서내용 보여주는 영역 -->
+        </div>
+        <div class="box right">
+          <!-- 3. 키워드 검색 영역 -->
+          <div class="box03">
+            <h1 class="box-title">답변 문서 내 키워드 검색</h1>
+            <div>
+              <input type="search" class="input-search" id="ans-doc-keyword-input" placeholder="키워드를 입력하세요."/>
+            </div>
+            <!-- 검색 내용 출력 -->
+            <div class="list-search" id="ans-doc-keyword-list">
+            	<p class="box-default" id="ans-doc-keyword-default">검색 내용이 없습니다.</p>
+              <!-- <ul>
+                <li>
+                  <a>(2016-2017) 고병원성 조류인플루엔자 역학조사분석보...</a>
+                  <p>구제역 바이러스 역학조사결과 검출향상을 고려하면... 경상북도 역학조사결과... 발생농장에는 고령지택에서의 역학조사결과...</p>
+                </li>
+                <li>
+                  <a>(2016-2017) 고병원성 조류인플루엔자 역학조사분석보...</a>
+                  <p>구제역 바이러스 역학조사결과 검출향상을 고려하면... 경상북도 역학조사결과... 발생농장에는 고령지택에서의 역학조사결과...</p>
+                </li>
+              </ul> -->
+            </div>
+          </div>
+          <!-- //3. 키워드 검색 영역 -->
+          <!-- 4. 답변문서 영역 (10개 문서까지 출력) -->
+          <div class="box04">
+            <h1 class="box-title">답변 문서</h1>
+            <div class="tab-menu">
+				<ul>
+					<li class="is-active tab-left" data-tab="tab-1">
+						<button type="button" id="similarity-button">연관도 우선</button>
+					</li>
+					<li class="tab-right" data-tab="tab-2">
+						<button type="button" id="category-button">카테고리별</button>
+					</li>
+				</ul>
+            </div>
+            <!-- 탭 -->
+            <div class="tab-body">
+            	<p class="box-default" id="ans-doc-tab-default">답변 문서가 없습니다.</p>
+  				<div class="tab-content is-active ans-doc-relation" id="tab-1">
+                  <!-- <table class="table-doc" id="ans-doc-tab1-table">
+                    <colgroup>
+                      <col width="22%" /> <col width="60%" /> <col width="28%" />
+                    </colgroup>
+                    <thead>
+	                    <tr>
+	                        <th>분류</th>
+	                        <th>문서명</th>
+	                        <th>점수</th>
+	                    </tr>
+                    </thead>
+                    <tr>
+                        <td>보고서</td>
+                        <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                        <td>0.995</td>
+                    </tr>
+                    <tr>
+                        <td>보고서</td>
+                        <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                        <td>0.751</td>
+                    </tr>
+                  </table> -->
+  				</div>
+  				
+  				<div class="tab-content ans-doc-category" id="tab-2">
+					<!-- <div class="ctgry">
+						<h2 class="box-title-sub">
+							<span class="more">▼</span> 보고서(9)
+						</h2>
+						<div class="table-box">
+							<table class="table-doc">
+								<colgroup>
+									<col width="22%" />
+									<col width="60%" />
+									<col width="28%" />
+								</colgroup>
+								<thead>
+									<tr>
+										<th>분류</th>
+										<th>문서명</th>
+										<th>점수</th>
+									</tr>
+								</thead>
+								<tr>
+									<td>보고서</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.995</td>
+								</tr>
+								<tr>
+									<td>보고서</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+								<tr>
+									<td>보고서</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+							</table>
+							
+							<div class="page-num mt-10 mb-5">
+								<div class="inner">
+									<li><a href="#" class="btn-prev-first">◀◀</a></li>
+									<li><a href="#" class="btn-prev">◀</a></li>
+									<li><a href="#" class="current">1</a> <a href="#">2</a>
+										<a href="#">3</a> <a href="#">...</a></li>
+									<li><a href="#" class="btn-next">▶</a></li>
+									<li><a href="#" class="btn-next-end">▶▶</a></li>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="ctgry">
+						<h2 class="box-title-sub">
+							<span class="more">▼</span> 국내기사(9)
+						</h2>
+						<div class="table-box">
+							<table class="table-doc">
+								<colgroup>
+									<col width="22%" />
+									<col width="60%" />
+									<col width="28%" />
+								</colgroup>
+								<thead>
+									<tr>
+										<th>분류</th>
+										<th>문서명</th>
+										<th>점수</th>
+									</tr>
+								</thead>
+								<tr>
+									<td>국내기사</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.995</td>
+								</tr>
+								<tr>
+									<td>국내기사</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+								<tr>
+									<td>국내기사</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+							</table>
+							
+							<div class="page-num mt-10 mb-5">
+								<div class="inner">
+									<li><a href="#" class="btn-prev-first">◀◀</a></li>
+									<li><a href="#" class="btn-prev">◀</a></li>
+									<li><a href="#" class="current">1</a> <a href="#">2</a>
+										<a href="#">3</a> <a href="#">...</a></li>
+									<li><a href="#" class="btn-next">▶</a></li>
+									<li><a href="#" class="btn-next-end">▶▶</a></li>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="ctgry">
+						<h2 class="box-title-sub">
+							<span class="more">▼</span> 논문(9)
+						</h2>
+						<div class="table-box">
+							<table class="table-doc">
+								<colgroup>
+									<col width="22%" />
+									<col width="60%" />
+									<col width="28%" />
+								</colgroup>
+								<thead>
+									<tr>
+										<th>분류</th>
+										<th>문서명</th>
+										<th>점수</th>
+									</tr>
+								</thead>
+								<tr>
+									<td>논문</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.995</td>
+								</tr>
+								<tr>
+									<td>논문</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+								<tr>
+									<td>논문</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+							</table>
+							
+							<div class="page-num mt-10 mb-5">
+								<div class="inner">
+									<li><a href="#" class="btn-prev-first">◀◀</a></li>
+									<li><a href="#" class="btn-prev">◀</a></li>
+									<li><a href="#" class="current">1</a> <a href="#">2</a>
+										<a href="#">3</a> <a href="#">...</a></li>
+									<li><a href="#" class="btn-next">▶</a></li>
+									<li><a href="#" class="btn-next-end">▶▶</a></li>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="ctgry">
+						<h2 class="box-title-sub">
+							<span class="more">▼</span> 카테고리(9)
+						</h2>
+						<div class="table-box">
+							<table class="table-doc">
+								<colgroup>
+									<col width="22%" />
+									<col width="60%" />
+									<col width="28%" />
+								</colgroup>
+								<thead>
+									<tr>
+										<th>분류</th>
+										<th>문서명</th>
+										<th>점수</th>
+									</tr>
+								</thead>
+								<tr>
+									<td>카테고리</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.995</td>
+								</tr>
+								<tr>
+									<td>카테고리</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+								<tr>
+									<td>카테고리</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+							</table>
+							
+							<div class="page-num mt-10 mb-5">
+								<div class="inner">
+									<li><a href="#" class="btn-prev-first">◀◀</a></li>
+									<li><a href="#" class="btn-prev">◀</a></li>
+									<li><a href="#" class="current">1</a> <a href="#">2</a>
+										<a href="#">3</a> <a href="#">...</a></li>
+									<li><a href="#" class="btn-next">▶</a></li>
+									<li><a href="#" class="btn-next-end">▶▶</a></li>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+					<div class="ctgry">
+						<h2 class="box-title-sub">
+							<span class="more">▼</span> 카테고리(9)
+						</h2>
+						<div class="table-box">
+							<table class="table-doc">
+								<colgroup>
+									<col width="22%" />
+									<col width="60%" />
+									<col width="28%" />
+								</colgroup>
+								<thead>
+									<tr>
+										<th>분류</th>
+										<th>문서명</th>
+										<th>점수</th>
+									</tr>
+								</thead>
+								<tr>
+									<td>카테고리</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.995</td>
+								</tr>
+								<tr>
+									<td>카테고리</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+								<tr>
+									<td>카테고리</td>
+									<td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+									<td>0.454</td>
+								</tr>
+							</table>
+							
+								<div class="inner">
+									<li><a href="#" class="btn-prev-first">◀◀</a></li>
+									<li><a href="#" class="btn-prev">◀</a></li>
+									<li><a href="#" class="current">1</a> <a href="#">2</a>
+										<a href="#">3</a> <a href="#">...</a></li>
+									<li><a href="#" class="btn-next">▶</a></li>
+									<li><a href="#" class="btn-next-end">▶▶</a></li>
+								</div>
+							</div>
+						</div>
+					</div> -->
+					<!-- <div>
+                    <h2 class="box-title-sub">보고서</h2>
+                    <table class="table-doc">
+                      <colgroup>
+                        <col width="22%" /> <col width="60%" /> <col width="28%" />
+                      </colgroup>
+                      <thead>
+                      <tr>
+                          <th>분류</th>
+                          <th>문서명</th>
+                          <th>점수</th>
+                      </tr>
+                      </thead>
+                      <tr>
+                          <td>보고서</td>
+                          <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                          <td>0.995</td>
+                      </tr>
+                      <tr>
+                          <td>보고서</td>
+                          <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                          <td>0.454</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div>
+                    <h2 class="box-title-sub">국내기사</h2>
+                    <table class="table-doc">
+                      <colgroup>
+                        <col width="22%" /> <col width="60%" /> <col width="28%" />
+                      </colgroup>
+                      <thead>
+                      <tr>
+                          <th>분류</th>
+                          <th>문서명</th>
+                          <th>점수</th>
+                      </tr>
+                      </thead>
+                      <tr>
+                          <td>국내기사</td>
+                          <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                          <td>0.995</td>
+                      </tr>
+                      <tr>
+                          <td>국내기사</td>
+                          <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                          <td>0.454</td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div>
+                    <h2 class="box-title-sub">논문</h2>
+                    <table class="table-doc">
+                      <colgroup>
+                        <col width="22%" /> <col width="60%" /> <col width="28%" />
+                      </colgroup>
+                      <thead>
+                      <tr>
+                          <th>분류</th>
+                          <th>문서명</th>
+                          <th>점수</th>
+                      </tr>
+                      </thead>
+                      <tr>
+                          <td>논문</td>
+                          <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                          <td>0.995</td>
+                      </tr>
+                      <tr>
+                          <td>논문</td>
+                          <td>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</td>
+                          <td>0.454</td>
+                      </tr>
+                    </table>
+                  </div> -->
+  				</div>
+  			</div>
+          </div>
+          <!-- //4. 답변문서 영역 (10개 문서까지 출력) -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- //답변 및 출력 영역 -->
+  <!-- 팝업 : 답변에 대한 의견 및 평점-->
+  <div class="popup-wrap">
+    <section class="popup">
+    	<div class="popup-head">
+   			<h1>답변에 대한 의견 및 평점</h1>
+   		</div>
+    	<div class="popup-body">
+    	  <div class="popup-content">
+    		  <h2>답변 및 평점</h2>
+          <div id="popup1-answer-rate">
+              <!-- 답변 내용 출력 -->
+              <!-- <div class="popup-answer">
+                <p>2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입 되었을 가능성이 가장 높습니다.</p>
+              </div> -->
+              <!-- 평점 -->
+              <!-- <div class="popup-gpa">
+                <span>9.5</span>
+                <div class="starRevAvr">
+                  <span class="starAvrR1 on"></span>
+                  <span class="starAvrR2 on"></span>
+                  <span class="starAvrR1 on"></span>
+                  <span class="starAvrR2 on"></span>
+                  <span class="starAvrR1 on"></span>
+                  <span class="starAvrR2 on"></span>
+                  <span class="starAvrR1 on"></span>
+                  <span class="starAvrR2 on"></span>
+                  <span class="starAvrR1 on"></span>
+                  <span class="starAvrR2"></span>
+                </div>
+              </div> -->
+            </div>
+          <h2>의견</h2>
+          <!-- 의견 출력 -->
+          <div>
+            <table class="table-review">
+                <!-- <colgroup>
+                  <col width="7%" /> <col width="7%" /> <col width="36%" /> <col width="37%" /> <col width="13%" />
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>NO</th>
+                    <th>평점</th>
+                    <th>질문내용</th>
+                    <th>의견</th>
+                    <th>작성일</th>
+                </tr>
+                </thead>
+                <tr>
+                    <td class="ct">3</td>
+                    <td class="ct">4.5</td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td>2021.06.22</td>
+                </tr>
+                <tr>
+                    <td class="ct">2</td>
+                    <td class="ct">4.5</td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td>2021.06.12</td>
+                </tr>
+                <tr>
+                    <td class="ct">1</td>
+                    <td class="ct">4.5</td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td>2021.06.10</td>
+              </tr>
+              <tr>
+                    <td class="ct">3</td>
+                    <td class="ct">4.5</td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td>2021.06.22</td>
+                </tr>
+                <tr>
+                    <td class="ct">2</td>
+                    <td class="ct">4.5</td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td>2021.06.12</td>
+                </tr>
+                <tr>
+                    <td class="ct">1</td>
+                    <td class="ct">4.5</td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td><div>2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth2014/2015년 구제역 Foot-and-Mouth</div></td>
+                    <td>2021.06.10</td>
+              	</tr> -->
+            </table>
+            <!-- <div class="table-page">
+              <a>1</a>
+            </div> -->
+          </div>
+        </div>
+  		</div>
+  		<div class="popup-foot">
+  			<div class="btn_wrap">
+  				<button type="button" class="btn-popup-next"><span>내 의견 남기기</span></button>
+  			</div>
+  		</div>
+  		<div class="popup-close">
+  			<button type="button" class="btn-popup-close"></button>
+  		</div>
+	  </section>
+  </div>
+  <!-- //팝업 : 답변에 대한 의견 및 평점-->
+  <!-- 팝업 : 의견 및 평점 남기기-->
+  <div class="popup-wrap-2">
+    <section class="popup-2">
+    	<div class="popup-head">
+    		<h1>의견 및 평점 남기기</h1>
+  		</div>
+  		<div class="popup-body">
+    		<div class="popup-content">
+    			<h2>답변</h2>
+          <div>
+            <!-- 답변 내용 출력 -->
+            <div class="popup-answer" id="popup2-answer">
+              <!-- <p>2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입 되었을 가능성이 가장 높습니다.</p> -->
+            </div>
+          </div>
+      </div>
+  		</div>
+  		<div class="popup-foot">
+  			<div>
+          <!-- 의견 평점-->
+          <form>
+            <div class="starRev" id="popup2-starRev">
+              <span class="starR1 on" id="0.5"></span>
+              <span class="starR2"></span>
+              <span class="starR1"></span>
+              <span class="starR2"></span>
+              <span class="starR1"></span>
+              <span class="starR2"></span>
+              <span class="starR1"></span>
+              <span class="starR2"></span>
+              <span class="starR1"></span>
+              <span class="starR2"></span>
+            </div>
+            <input type="hidden" id="ans-seq">
+            <input type="hidden" id="qst-content">
+            <textarea class="input-review" placeholder="이곳에 의견을 남겨주세요."></textarea>
+            <button type="button" class="btn-popup-cancel"><span>취소</span></button>
+  			<button type="button" class="btn-popup-submit"><span>저장</span></button>
+          </form>
+  			</div>
+  		</div>
+  		<div class="popup-close">
+  			<button type="button" class="btn-popup-close"></button>
+  		</div>
+	  </section>
+  </div>
+  <!-- //팝업 : 의견 및 평점 남기기-->
+  <!-- 팝업 : 정보수정-->
+  <div class="popup-wrap-3">
+    <section class="popup-3">
+    	<div class="popup-head">
+    		<h1>정보수정</h1>
+  		</div>
+  		<div class="popup-body">
+        <form>
+          <h2>아이디</h2>
+          <input type="text" name="id" id="user-id" class="input-id-fix" th:value="${session['USER_ID']}" readonly/>
+          <h2>비밀번호</h2>
+          <input type="password" name="pwd" id="user-password" placeholder="비밀번호"/>
+          <h2>새 비밀번호</h2>
+          <input type="password" name="newpwd" id="new-password" placeholder="새 비밀번호"/>
+          <h2>이름</h2>
+          <input type="text" name="username" id="user-name"placeholder="이름"/>
+          <h2>핸드폰</h2>
+          <input type="number" name="userphone" id="user-phone" maxlength='11' placeholder="'-'을 제외한 숫자를 입력해주세요."/>
+          <div>
+          <button type="button" class="btn-popup-cancel"><span>취소</span></button>
+          <button type="button" class="btn-popup-update"><span>수정</span></button>
+          </div>
+        </form>
+  		</div>
+  		<div class="popup-close">
+  			<button type="button" class="btn-popup-close"></button>
+  		</div>
+	  </section>
+  </div>
+  <!-- //팝업 : 정보수정-->
+  <!-- 팝업 : 간편검색/정밀검색 설명-->
+  <div class="popup-wrap-4">
+    <section class="popup-4">
+  		<div class="popup-body">
+        <ul>
+          <li>
+            <span>· 간편검색 : </span><a>최초 20개 문서 단위로 답을 찾은 뒤
+                답이 없는 경우, 단위 만큼의 문서를 추가하여 검색하는 형태로
+                검색 시간을 절약할 수 있음 (약 3초 소요)</a>
+          </li>
+          <li>
+            <span>· 정밀검색 : </span><a>최초 240개 문서 단위로 답을 찾은 뒤
+                답이 없는 경우, 단위 만큼의 문서를 추가하여 검색하는 형태로
+                보다 정확한 답이 제공됨 (약 30초 소요)</a>
+          </li>
+        </ul>
+  		</div>
+	  </section>
+  </div>
+  <!-- 팝업 : 간편검색/정밀검색 설명-->
+  <!-- 팝업 : 원문보기-->
+  <div class="popup-wrap-5">
+    <section class="popup-5">
+      <div class="popup-head">
+        <h1>원문보기</h1>
+      </div>
+      <div class="popup-body">
+        <div class="popup-content">
+          <div class="popup-left">
+            <div class="popup-left-cnd" id="ans-popup-left-cnd">
+              <!-- <ul>
+                <li>
+                  <span>검색조건 :</span><a>백서(pdf), 간편검색(2회)</a>
+                </li>
+                <li>
+                  <span>질문 :</span><a>2014년 7~8월에 우리나라에서 발생한 구제역의 오염경로를 추정해본 결과는 무엇인가?</a>
+                </li>
+                <li>
+                  <span>답변 :</span><a>2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입 되었을 가능성이 가장 높습니다.</a>
+                </li>
+                <li>
+                  <span>SCORE : </span><a>74.54</a>
+                </li>
+                <li>
+                  <span>원문 :</span><a>2014/2015년 구제역 Foot-and-Mouth Disease 역학조사분석</a>
+                </li>
+              </ul> -->
+            </div>
+            <div id="ans-popup-ans-list">
+              <h1 class="box-title">해당 원문 내 답변 문장 리스트 (17개)</h1>
+              <div>
+                <table class="table-answer">
+                  <tr class="answer-active">
+                      <td>
+                          <ul>
+                            <li><a class="answer-score">SCORE : 74.54</a></li>
+                            <li class="answer-txt">2014년 상반기 우리나라 주변의 구제역 발생 상황, 바이러스 유전자 염기서열 분석, 역학적 상황 등을 분석하면 러시아, 중국, 북한 등지에서 우리나라로 오염원이 유입되었을 가능성이 가장 높습니다.</li>
+                          </ul>
+                      </td>
+                  </tr>
+                </table>
+                
+                <!-- <div class="page-num mt-10">
+                  <div class="inner">
+                    <li><a href="#" class="btn-prev-first">◀◀</a></li>
+                    <li><a href="#" class="btn-prev">◀</a></li>
+                    <li>
+                      <a href="#" class="current">1</a>
+                      <a href="#">2</a>
+                      <a href="#">3</a>
+                      <a href="#">4</a>
+                      <a href="#">5</a>
+                      <a href="#">...</a>
+                    </li>
+                    <li><a href="#" class="btn-next">▶</a></li>
+                    <li><a href="#" class="btn-next-end">▶▶</a></li>
+                  </div>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="popup-right">
+            <h1 class="box-title">문서 내용</h1>
+            <div class="list-smry ans-popup-ans-content">
+              <!-- <button type="button" class="btn-download">다운로드</button> -->
+              <ul>
+                <li>
+                  <span>제목</span><a>2014/2015 구제역 Foot-and-Mouth Disease 역학조사분석보고서</a>
+                </li>
+                <li>
+                  <span>발행기관</span><a>검역본부</a><span>발행일자</span><a>2015년 12월</a>
+                </li>
+              </ul>
+              <!--답변문서 pdf뷰어-->
+              <div class="pdfbox">
+              	<div id="pdfboxDiv" style="width: 100%; height: 800px;">
+              	</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="popup-close">
+  			<button type="button" class="btn-popup-close"></button>
+  		</div>
+	  </section>
+  </div>
+  <!-- //팝업 : 원문보기-->
+</div>
+</body>
+</html>

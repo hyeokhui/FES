@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+			
+<mapper namespace="com.ezfarm.fes.mapper.AnswerMapper">
+
+	<resultMap id="answerResult" type="AnswerVo">
+		<result 		property="ansSeq" 				column="ANS_SEQ"/>
+		<collection 	property="qstList" 				column="ANS_SEQ" 		ofType="com.ezfarm.fes.user.vo.QuestionVO" 	select="com.ezfarm.fes.user.mapper.QuestionMapper.selectQuestionByAnsSeq"/>
+	</resultMap>
+	
+	<select id="selectAnswer" resultMap="answerResult">
+		SELECT 
+			  A.ANS_SEQ
+			, A.ANS_CONTENT
+			, (SELECT AVG(QST_ANS_RATE) FROM QUESTION Q WHERE Q.ANS_SEQ = A.ANS_SEQ) AS ANS_RATE
+			, A.CRE_DT
+			, A.UPD_DT
+		FROM 
+			ANSWER A
+		WHERE ANS_CONTENT = #{ansContent}
+	</select>
+	
+	<insert id="insertAnswer" parameterType="com.ezfarm.fes.vo.AnswerVo">
+		INSERT INTO ANSWER
+		(
+		    ANS_CONTENT
+		  , CRE_DT
+		  , UPD_DT
+		)
+		SELECT 
+			  #{ansContent}
+			,  NOW()
+			,  NOW()      
+		FROM DUAL
+		WHERE NOT EXISTS (
+		           	SELECT ANS_CONTENT
+						FROM ANSWER
+		           	WHERE ANS_CONTENT = #{ansContent}
+		) LIMIT 1
+	</insert>
+	
+</mapper>

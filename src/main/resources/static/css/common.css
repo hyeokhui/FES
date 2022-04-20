@@ -1,0 +1,153 @@
+@charset 'utf-8';
+
+/*-------------------------------------------------------------------
+    @초기화
+-------------------------------------------------------------------*/
+html, body, div, ul, ol, dl, li, dt, dd, p, h1, h2, h3, h4, h5, h6, table, thead, tbody, tr, th, td, caption, address, article, aside,
+canvas, details, figure, figcaption, main, footer, header, menu, nav, section,
+button, select, textarea, input, fieldset, legend, label, a, span, strong, em, address, dfn, small, i, b {margin:0; padding:0; border:0; list-style:none; font-style:normal; font-size:inherit; font-weight:inherit; font-family:inherit; color:inherit; box-sizing:inherit; -webkit-box-sizing:inherit; -moz-box-sizing:inherit; -o-box-sizing:inherit; -webkit-print-color-adjust:exact;}
+:before, :after {box-sizing:inherit; -webkit-box-sizing:inherit; -moz-box-sizing:inherit; -o-box-sizing:inherit;}
+main, article, aside, canvas, details, figure, figcaption, footer, header, menu, nav, section {display:block;}
+body {font-family: 'NotoSans', sans-serif; font-weight:400; font-size:15px; line-height:1.4; word-break:break-all; word-wrap:break-word; box-sizing:border-box; -webkit-box-sizing:border-box; -moz-box-sizing:border-box; -o-box-sizing:border-box; -webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; width:100%; height:100%; background-color:#ebecf2; color:#181818;}
+html[lang=ja] body, html[lang=zh] body {word-break:normal;}
+[hidden], hr {display:none;}
+img {vertical-align:middle;}
+button {background-color:transparent; cursor:pointer;}
+fieldset, iframe {width:100%;}
+img, a, frame, iframe, fieldset {border:0;}
+a {text-decoration:none;}
+table {width:100%; border-spacing:0; border-collapse:collapse;}
+caption {height:1px; overflow:hidden;}
+legend {position:fixed; overflow: hidden; border: 0; margin:-1px; width: 1px; height: 1px; clip: rect(1px, 1px, 1px, 1px); -webkit-clip-path: inset(50%); clip-path: inset(50%);}
+button {overflow:hidden; background-color:transparent; cursor:pointer;}
+button::-moz-focus-inner {border:0px; padding:0px;}
+select {appearance:none; -webkit-appearance:none; -moz-appearance:none; -o-appearance:none;}
+textarea {resize:none;}
+select::-ms-expand {display:none;}
+input::search-decoration, input::search-cancel-button, input::search-results-button, input::search-results-decoration {display:none;}
+input::-webkit-search-decoration, input::-webkit-search-cancel-button, input::-webkit-search-results-button, input::-webkit-search-results-decoration {display:none;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button {-webkit-appearance:none; margin:0;}
+input::-webkit-calendar-picker-indicator {-webkit-appearance:none;}
+.dv-android [tabindex='0']:focus, .dv-android a:focus, .dv-android button:focus, .dv-android input:focus, .dv-android textarea:focus, .dv-android select:focus {outline:0;}
+.dv-ios [tabindex='0'], .dv-ios a, .dv-ios button, .dv-ios input, .dv-ios textarea, .dv-ios select {-webkit-tap-highlight-color:transparent;}
+input:focus {outline: none;}
+textarea:focus {outline: none;}
+
+/*-------------------------------------------------------------------
+    @웹폰트
+-------------------------------------------------------------------*/
+@font-face {
+  font-family: 'NotoSans';  font-style: normal;  font-weight: 300;  src: url('../fonts/noto-sans-kr-v13-latin_korean-300.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('../fonts/noto-sans-kr-v13-latin_korean-300.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/noto-sans-kr-v13-latin_korean-300.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-300.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-300.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/noto-sans-kr-v13-latin_korean-300.svg#NotoSansKR') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'NotoSans';  font-style: normal;  font-weight: 400;  src: url('../fonts/noto-sans-kr-v13-latin_korean-regular.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('../fonts/noto-sans-kr-v13-latin_korean-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/noto-sans-kr-v13-latin_korean-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-regular.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/noto-sans-kr-v13-latin_korean-regular.svg#NotoSansKR') format('svg'); /* Legacy iOS */
+}
+
+@font-face {  font-family: 'Noto Sans KR';  font-style: normal;  font-weight: 500;  src: url('../fonts/noto-sans-kr-v13-latin_korean-500.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('../fonts/noto-sans-kr-v13-latin_korean-500.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/noto-sans-kr-v13-latin_korean-500.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-500.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-500.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/noto-sans-kr-v13-latin_korean-500.svg#NotoSansKR') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'NotoSans';  font-style: normal;  font-weight: 700;  src: url('../fonts/noto-sans-kr-v13-latin_korean-700.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('../fonts/noto-sans-kr-v13-latin_korean-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/noto-sans-kr-v13-latin_korean-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-700.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/noto-sans-kr-v13-latin_korean-700.svg#NotoSansKR') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'NotoSans';  font-style: normal;  font-weight: 900;  src: url('../fonts/noto-sans-kr-v13-latin_korean-900.eot'); /* IE9 Compat Modes */
+  src: local(''),
+       url('../fonts/noto-sans-kr-v13-latin_korean-900.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/noto-sans-kr-v13-latin_korean-900.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-900.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/noto-sans-kr-v13-latin_korean-900.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/noto-sans-kr-v13-latin_korean-900.svg#NotoSansKR') format('svg'); /* Legacy iOS */
+}
+
+/* 폰트 (사이즈별) */
+.noto-light {font-family:'NotoSans', sans-serif; font-weight: 300;}
+.noto-regular {font-family:'NotoSans', sans-serif; font-weight: 400;}
+.noto-medium {font-family:'NotoSans', sans-serif; font-weight: 500;}
+.noto-bold {font-family:'NotoSans', sans-serif; font-weight: 700;}
+.noto-black {font-family:'NotoSans', sans-serif; font-weight: 900;}
+
+
+/*-------------------------------------------------------------------
+    @색상
+    - 배경: bg-, 텍스트: txt-
+    - 밝은: -light, 어두운: -dark
+-------------------------------------------------------------------*/
+.bg-gray {background-color: #ebecf2;}
+.bg-white {background-color: #ffffff;}
+.bg-blue {background-color: #354993;}
+.bg-sky {background-color: #a6b6d6;}
+.font-black {color: #181818;}
+.font-white {color: #ffffff;}
+.font-gray {color: #7b7b7b;}
+.font-gray-light {color: #b2b2b2;}
+.font-gray-dark {color: #606060;}
+.font-blue {color: #0f2164;}
+.font-sky {color: #7e84a3;}
+
+/*-------------------------------------------------------------------
+    @여백
+-------------------------------------------------------------------*/
+/* 여백 (margin_top) */
+.mt-0 {margin-top: 0px !important;}
+.mt-5 {margin-top: 5px !important;}
+.mt-10 {margin-top: 10px !important;}
+.mt-15 {margin-top: 15px !important;}
+.mt-20 {margin-top: 20px !important;}
+.mt-25 {margin-top: 25px !important;}
+.mt-30 {margin-top: 30px !important;}
+
+/* 여백 (margin_bottom) */
+.mb-0 {margin-bottom: 0px !important;}
+.mb-5 {margin-bottom: 5px !important;}
+.mb-10 {margin-bottom: 10px !important;}
+.mb-15 {margin-bottom: 15px !important;}
+.mb-20 {margin-bottom: 20px !important;}
+.mb-25 {margin-bottom: 25px !important;}
+.mb-30 {margin-bottom: 30px !important;}
+
+/* 여백 (margin_left) */
+.ml-0 {margin-left: 0px !important;}
+.ml-5 {margin-left: 5px !important;}
+.ml-10 {margin-left: 10px !important;}
+.ml-15 {margin-left: 15px !important;}
+.ml-20 {margin-left: 20px !important;}
+.ml-25 {margin-left: 25px !important;}
+.ml-30 {margin-left: 30px !important;}
+
+/* 여백 (margin_right) */
+.mr-0 {margin-right: 0px !important;}
+.mr-5 {margin-right: 5px !important;}
+.mr-10 {margin-right: 10px !important;}
+.mr-15 {margin-right: 15px !important;}
+.mr-20 {margin-right: 20px !important;}
+.mr-25 {margin-right: 25px !important;}
+.mr-30 {margin-right: 30px !important;}
+
+/* 가운데 정렬 */
+.ct {text-align: center;}

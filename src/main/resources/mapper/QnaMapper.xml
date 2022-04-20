@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+			
+<mapper namespace="com.ezfarm.fes.mapper.QnaMapper">
+
+	<resultMap id="answerResult" type="AnswerVo">
+		<result 		property="ansSeq" 		column="ANS_SEQ"/>
+		<collection 	property="qstList" 		column="ANS_SEQ" 	javaType="java.util.ArrayList"	ofType="com.ezfarm.fes.user.vo.QuestionVO" 	select="com.ezfarm.fes.mapper.QnaMapper.selectQuestionList"/>
+	</resultMap>
+	
+	<select id="selectAnswer" parameterType="AnswerVo" resultMap="answerResult">
+		SELECT 
+			  A.ANS_SEQ
+			, A.ANS_CONTENT
+			, (SELECT AVG(QST_ANS_RATE) FROM QUESTION Q WHERE Q.ANS_SEQ = A.ANS_SEQ) AS ANS_RATE
+			, DOC_ID
+			, PARAGRAPH_ID
+			, A.CRE_DT
+			, A.UPD_DT
+		FROM 
+			ANSWER A
+		WHERE 1=1
+			<if test = ' ansSeq != null and ansSeq != "" '>
+				AND A.ANS_SEQ = #{ansSeq}
+			</if>
+			<if test = ' docId != null and docId != "" '>
+				AND A.DOC_ID = #{docId}
+			</if>
+			<if test = ' paragraphId != null and paragraphId != "" '>
+				AND A.PARAGRAPH_ID = #{paragraphId}
+			</if>
+	</select>
+	
+	<!-- <insert id="insertAnswer" parameterType="com.ezfarm.fes.vo.AnswerVo">
+		INSERT INTO ANSWER
+		(
+		    ANS_CONTENT
+		  , DOC_ID
+		  , PARAGRAPH_ID
+		  , CRE_DT
+		  , UPD_DT
+		)
+		SELECT 
+			  #{ansContent}
+			,  #{docId}
+			,  #{paragraphId}
+			,  NOW()
+			,  NOW()      
+		FROM DUAL
+		WHERE NOT EXISTS (
+		           	SELECT ANS_CONTENT
+						FROM ANSWER
+		           	WHERE ANS_CONTENT = #{ansContent}
+		) LIMIT 1
+	</insert> -->
+	
+	<insert id="insertAnswer" parameterType="com.ezfarm.fes.vo.AnswerVo">
+		INSERT INTO ANSWER
+		(
+		    ANS_CONTENT
+		  , DOC_ID
+		  , PARAGRAPH_ID
+		  , CRE_DT
+		  , UPD_DT
+		)
+		SELECT 
+			  #{ansContent}
+			,  #{docId}
+			,  #{paragraphId}
+			,  NOW()
+			,  NOW()      
+		FROM DUAL
+		WHERE NOT EXISTS (
+		           	SELECT ANS_CONTENT
+					FROM ANSWER
+		           	WHERE 1=1
+		           		AND DOC_ID = #{docId}
+		           		AND PARAGRAPH_ID = #{paragraphId}
+		           		AND ANS_CONTENT = #{ansContent}
+		) LIMIT 1
+	</insert>
+	
+	<select id="selectQuestion" parameterType="QuestionVo" resultType="QuestionVo">
+		SELECT
+			  QST_SEQ 
+			, ANS_SEQ
+			, USER_ID
+			, QST_CONTENT
+			, QST_OPINION
+			, QST_ANS_RATE
+			, CRE_DT
+			, UPD_DT
+		FROM 
+			QUESTION
+		WHERE USER_ID = #{userId}
+	</select>
+	
+	<select id="selectQuestionList" parameterType="QuestionVo" resultType="QuestionVo">
+		SELECT
+			  QST_SEQ 
+			, ANS_SEQ
+			, USER_ID
+			, QST_CONTENT
+			, QST_OPINION
+			, QST_ANS_RATE
+			, CRE_DT
+			, UPD_DT
+		FROM 
+			QUESTION
+		WHERE ANS_SEQ = #{ANS_SEQ}
+		ORDER BY CRE_DT ASC
+	</select>
+	
+	<insert id="insertQuestionOpinion" parameterType="QuestionVo">
+		INSERT INTO QUESTION
+		(
+		      ANS_SEQ
+			, USER_ID
+			, QST_CONTENT
+			, QST_OPINION
+			, QST_ANS_RATE
+			, CRE_DT
+			, UPD_DT
+		)
+		VALUES
+		(
+			  #{ansSeq}
+			, #{userId}
+			, #{qstContent}
+			, #{qstOpinion}
+			, #{qstAnsRate}
+			, NOW()
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateQuestionOpinion" parameterType="QuestionVo">
+		UPDATE QUESTION
+		SET   QST_OPINION = #{qstOpinion}
+			, QST_ANS_RATE = #{qstAnsRate}
+			, UPD_DT = NOW()
+		WHERE   QST_SEQ = #{qstSeq}
+			AND USER_ID = #{userId}
+	</update>
+	
+</mapper>

@@ -1,0 +1,2 @@
+-테스트
+1. GET api : http://localhost:8080/api/testDoc/1 ( [ip]/[index]/[type]/[id] )

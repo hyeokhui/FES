@@ -1,0 +1,307 @@
+@charset 'utf-8';
+
+/*-------------------------------------------------------------------
+    @질의응답페이지 레이아웃
+-------------------------------------------------------------------*/
+/* 채팅 영역 */
+.chat-wrap {
+  width: 440px;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
+  top: 0px;
+  left: 0px;
+  position: fixed;
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  z-index: 2;
+}
+.chat-header {
+  width: 440px;
+  height: 80px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
+  padding: 29px 48px 29px 48px;
+  top: 0px;
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  -ms-user-select: none; /* 드래그 방지 */
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.chat-header > p {
+  font-weight: 700;
+  font-size: 20px;
+  margin-top: -3px;
+}
+.chat-content {
+  margin-top: 80px;
+  width: 440px;
+  height: 75%;
+  display: flex;
+  justify-content: space-between;
+  overflow: auto;
+}
+.chat-content::-webkit-scrollbar {
+   width: 10px;
+ }
+ .chat-content::-webkit-scrollbar-thumb {
+   background-color: #b9b9b9;
+   border-radius: 10px;
+   background-clip: padding-box;
+   border: 2px solid transparent;
+   margin: 200px 0px;
+ }
+ /*
+ .chat-content::-webkit-scrollbar-track {
+   background-color: grey;
+   border-radius: 10px;
+   box-shadow: inset 0px 0px 5px white;
+ }*/
+/*
+.chat-content::-webkit-scrollbar {
+  display: none;
+}*/
+.chat-footer {
+  width: 440px;
+  height: 150px;
+  padding: 20px 48px 20px 48px;
+  bottom: 0px;
+  background: url('../img/bg_chat.jpg');
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
+  border-top: 1px solid #ebecf2;
+  position: fixed;
+}
+.chat-footer label {
+  font-weight: 700;
+  color: #7e84a3;
+}
+
+/* 관련문서 영역 */
+.content {
+  margin: 30px 0px 27px 486px;
+  padding-right: 48px;
+}
+.content .left {
+  width: 64.5%;
+  height: 100%;
+  margin-right: 26px;
+  padding-bottom: 16px;
+}
+.content .right {
+  width: 33%;
+  height: 100%;
+  padding-bottom: 16px;
+}
+.box {
+  float: left;
+}
+.box > div {
+  padding: 24px 30px 24px 30px;
+  margin-bottom: 28px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.08);
+  border-radius: 6px;
+}
+.box > .box01 {
+  border-radius: 0px 6px 6px 6px;
+}
+/*.box > .box02 {
+  height: 1014px;
+}*/
+/*
+.box > .box04 {
+  height: 812px;
+}*/
+.box01 > div {
+  display: none;
+}
+.box01 > .box-title {
+  margin-bottom: 0px;
+}
+.box01 > button:hover {
+  text-decoration: underline;
+  text-underline-position: under;
+}
+.box-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.box-title-sub {
+  margin: 16px 0px 12px 4px;
+  padding-left: 2px;
+  font-weight: 700;
+  cursor: pointer;
+  -ms-user-select: none; /* 드래그 방지 */
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.box-title-sub:hover {
+  text-decoration: underline;
+  text-underline-position: under;
+}
+.box-title-ex{
+  font-size: 13px;
+  font-weight: 500;
+  color: #7b7b7b;
+  margin-left: 7px;
+}
+.more {
+  font-size: 11px;
+  color: #7e84a3;
+}
+.answerlist {
+  margin-top: 24px;
+  width: 100%;
+  border-radius: 6px;
+}
+.answerlist .page-num li a {
+  margin-right: 0px;
+}
+/* 초기화면 텍스트 : 답변 문서가 없습니다. */
+.box-default {
+  top: 30%;
+  margin: 60px 0px;
+  color: #b2b2b2;
+  text-align: center;
+  position: relative;
+}
+
+/* 관련문서 탭 (상단) */
+.doc {
+  width: 100%;
+  height: 50px;
+  -ms-user-select: none; /* 드래그 방지 */
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.tab-doc {
+  float: left;
+}
+.tab-doc ul {
+  overflow: hidden;
+}
+.tab-doc li {
+  float: left;
+  width: 180px;
+  height: 44px;
+  padding: 10px 20px 0px 30px;
+  border-radius: 6px 6px 0px 0px;
+  margin: 6px 10px 0px 0px;
+  cursor: pointer;
+}
+.tab-doc-on {
+  font-weight: 700;
+  color: #0f2164;
+  background-color: #ffffff;
+}
+.tab-doc-off {
+  font-weight: 500;
+  color: #ffffff;
+  background-color: #a6b6d6;
+}
+.tab-doc-off button {
+  background: url('../img/btn_tab-close-white.png') no-repeat 100% 100%;
+}
+
+/* 정보수정, 로그아웃 (오른쪽상단) */
+.info {
+  float: right;
+  padding: 14px 14px 0px 0px;
+}
+.info ul {
+  overflow: hidden;
+}
+.info li {
+  float: left;
+  margin-left: 16px;
+  cursor: pointer;
+}
+.info li:hover {
+  text-decoration: underline;
+  text-underline-position: under;
+}
+
+/* 페이지넘버 */
+.page-num {
+  margin-bottom: 10px;
+  text-align:center;
+  -ms-user-select: none; /* 드래그 방지 */
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.page-num li {
+  display: inline-block;
+}
+.page-num a {
+  margin-left: -1px;
+  display: inline-block;
+  *zoom: 1;
+  height: 35px;
+  line-height: 35px;
+  width: 30px;
+  vertical-align: top;
+  color: #b2b2b2;
+}
+.page-num a:hover	{
+  color: #0f2164;
+}
+.page-num a.current {
+  color: #0f2164;
+}
+.btn-prev-first, .btn-prev, .btn-next, .btn-next-end {
+  font-size: 9px;
+}
+
+/*-------------------------------------------------------------------
+    @미디어쿼리
+-------------------------------------------------------------------*/
+@media screen and (max-width: 1890px) {
+  /*.content {position:absolute;}*/
+  .content .left {width: 63.5%;}
+  .content .right {width: 34%;}
+}
+@media screen and (max-width: 1840px) {
+  .content .left {width: 61.5%;}
+  .content .right {width: 36%;}
+}
+@media screen and (max-width: 1770px) {
+  .content .left {width: 60.5%;}
+  .content .right {width: 37%;}
+}
+@media screen and (max-width: 1735px) {
+  .content .left {width: 59.5%;}
+  .content .right {width: 38%;}
+}
+@media screen and (max-width: 1705px) {
+  .content .left {width: 58.5%;}
+  .content .right {width: 39%;}
+}
+@media screen and (max-width: 1680px) {
+  .content .left {width: 57.5%;}
+  .content .right {width: 40%;}
+}
+@media screen and (max-width: 1650px) {
+  .content .left {width: 56.5%;}
+  .content .right {width: 41%;}
+}
+@media screen and (max-width: 1620px) {
+  .content .left {width: 55.5%;}
+  .content .right {width: 42%;}
+}
+@media screen and (max-width: 1600px) {
+  .content > div {width: 1050px;}
+  .content .left {width: 580px;}
+  .content .right {width: 440px;}
+}

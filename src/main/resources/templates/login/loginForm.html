@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="title" content="가축질병대응 AI-MRCQA - 로그인">
+	<title>가축질병대응 AI-MRCQA - 로그인</title>
+	<link rel="stylesheet" type="text/css" href="/css/common.css">
+	<link rel="stylesheet" type="text/css" href="/css/components.css">
+	<link rel="stylesheet" type="text/css" href="/css/index.css">
+	<script type="text/javascript" src="/js/jquery/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+	<script>
+		$(document).ready(function() {
+			
+		});
+		
+		function loginAction() {
+			var userId = $('#userId').val();
+			var password = $('#password').val();
+			var loginFormAction = $('#loginForm').attr('action');
+			
+			$.ajax({
+				url : loginFormAction,
+				data : {
+					  'userId' : userId
+					, 'password' : password
+				},
+				type : 'POST',
+				success : function (data, textStatus, xhr){
+					console.log(xhr.status);
+					console.log(data);
+					//alert(xhr.status);
+					//$('#resultDiv').html('');
+					location.href = "/";
+				},
+				error: function(jqXHR, textStatus, errorThrown){
+				    console.log(textStatus + ' : ' + jqXHR.status + ' ' + errorThrown);
+				    alert('아이디 혹은 비밀번호가 잘못되었습니다.');
+				    //var errorMessage = '<p>아이디 혹은 비밀번호가 잘못되었습니다.</p>';
+				    //$('#resultDiv').html(errorMessage);
+				}
+			});
+		}
+	</script>
+
+	<div class="index-wrap">
+		<div class="index-content">
+			<div>
+				<h1>가축질병대응 AI-MRCQA</h1>
+				<p>과제번호 : 제 농축 2020-110호</p>
+				<p>과제명 : 인공지능(AI)을 이용한 재난형 동물질병 정보 시스템 구축</p>
+				<!-- 로그인 영역-->
+				<form id="loginForm" method="post" action="/login/loginProc">
+					<input type="text" name="userId" id="userId" class="input-id" placeholder="아이디" />
+					<input type="password" name="password" id="password" class="input-pwd" placeholder="비밀번호" />
+					<button type="button" class="btn-login" onclick="loginAction()">로그인</button>
+				</form>
+				<!-- //로그인 영역-->
+			</div>
+		</div>
+		<div class="index-footer">
+			<div>
+				<img src="/img/bg_index.jpg" alt="배경이미지" />
+				<p>
+					본 성과물은 2020년도 정부(농림식품부)의 재원으로 농림식품기술기획평가원의 지원을 받아 수행된<br>'인공지능(AI)을
+					이용한 재난형 동물질병 정보 시스템 구축'을 위한 연구과제의 AI기반 MRCQA 시스템입니다.
+				<p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

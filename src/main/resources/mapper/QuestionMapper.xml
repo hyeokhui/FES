@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+			
+<mapper namespace="com.ezfarm.fes.mapper.QuestionMapper">
+
+	<select id="selectQuestion" parameterType="QuestionVo" resultType="QuestionVo">
+		SELECT
+			  QST_SEQ 
+			, ANS_SEQ
+			, USER_ID
+			, QST_CONTENT
+			, QST_OPINION
+			, QST_ANS_RATE
+			, CRE_DT
+			, UPD_DT
+		FROM 
+			QUESTION
+		WHERE USER_ID = #{userId}
+	</select>
+	
+	<select id="selectQuestionList" parameterType="QuestionVo" resultType="QuestionVo">
+		SELECT
+			  QST_SEQ 
+			, ANS_SEQ
+			, USER_ID
+			, QST_CONTENT
+			, QST_OPINION
+			, QST_ANS_RATE
+			, CRE_DT
+			, UPD_DT
+		FROM 
+			QUESTION
+		WHERE ANS_SEQ = #{ANS_SEQ}
+	</select>
+	
+	<insert id="insertQuestionOpinion" parameterType="QuestionVo">
+		INSERT INTO QUESTION
+		(
+		      ANS_SEQ
+			, USER_ID
+			, QST_CONTENT
+			, QST_OPINION
+			, QST_ANS_RATE
+			, CRE_DT
+			, UPD_DT
+		)
+		VALUES
+		(
+			  #{ansSeq}
+			, #{userId}
+			, #{qstContent}
+			, #{qstOpinion}
+			, #{qstAnsRate}
+			, NOW()
+			, NOW()
+		)
+	</insert>
+	
+	<update id="updateQuestionOpinion" parameterType="QuestionVo">
+		UPDATE QUESTION
+		SET   QST_OPINION = #{qstOpinion}
+			, QST_ANS_RATE = #{qstAnsRate}
+			, UPD_DT = NOW()
+		WHERE   QST_SEQ = #{qstSeq}
+			AND USER_ID = #{userId}
+	</update>
+	
+</mapper>

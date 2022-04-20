@@ -1,0 +1,72 @@
+@charset 'utf-8';
+
+/*-------------------------------------------------------------------
+    @대화창
+-------------------------------------------------------------------*/
+.chat ul {
+  width: 100%;
+  list-style: none;
+  padding-bottom: 30px;
+}
+.chat ul li { width: 100%; }
+.chat ul li.left { text-align: left; }
+.chat ul li.right { text-align: right; }
+.chat ul li > div.user {
+  display: inline-block;
+  word-break: break-all;
+  margin: 30px 48px 0px 48px;
+  max-width: 70%;
+  padding: 18px 20px;
+  border-radius: 17px 17px 0px 17px;
+  background-color: #ebecf2;
+  color: #181818;
+  text-align: right;
+}
+.chat ul li > div.bots {
+  display: inline-block;
+  word-break: break-all;
+  margin: 30px 48px 0px 48px;
+  max-width: 70%;
+  padding: 18px 20px;
+  border-radius: 17px 17px 17px 0px;
+  background-color: #354993;
+  color: #ffffff;
+  font-weight: 300;
+  text-align: left;
+}
+.chat .chat-doc {
+  width: 100%;
+  margin: 10px 0px 6px 0px;
+  padding: 13px;
+  background-color: #ffffff;
+  color: #0f2164;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 700;
+  cursor: pointer;
+  outline: 0;
+}
+.chat .chat-doc:hover{
+  background-color: #ebecf2;
+}
+.chat .bots > h2 {
+  font-size: 14px;
+  color: #bccaff;
+  font-weight: 500;
+}
+.chat .bots > h3 {
+  font-size: 13px;
+  color: #bccaff;
+}
+.chat .bots > p > span{
+  font-size: 13px;
+  color: #bccaff;
+}
+.chat .bots > a {
+  font-size: 14px;
+  cursor: pointer;
+}
+.chat .bots > a:hover {
+  text-decoration: underline;
+  text-underline-position: under;
+}

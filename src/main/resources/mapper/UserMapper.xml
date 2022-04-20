@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ezfarm.fes.mapper.UserMapper">
+	
+	<resultMap id="userResult" type="UserVo">
+		<result property="userSeq" column="USER_SEQ"/>
+		<collection property="role" column="USER_SEQ" javaType="java.util.ArrayList" ofType="String" select="com.ezfarm.fes.mapper.RoleMapper.selectRolesByUserUserSeq"/>
+	</resultMap>
+	
+	<insert id="insertUser" parameterType="UserVo">
+		INSERT INTO USER
+		(
+			  USER_SEQ
+			, USER_ID
+			, PASSWORD
+			, NAME
+			, EMAIL
+			, PHONE
+			, CRE_DT
+			, UPD_DT
+		)
+		VALUES
+		(
+			  (SELECT IFNULL(MAX(user_seq)+1, 1) FROM USER U)
+			, #{userId}
+			, #{password}
+			, #{name}
+			, #{email}
+			, #{phone}
+			, NOW()
+			, NOW()
+		)
+		<selectKey resultType="Long" keyProperty="userSeq" keyColumn="USER_SEQ" order="AFTER">
+			SELECT LAST_INSERT_ID()+1
+		</selectKey>
+	</insert>
+	
+	<select id="selectUserList" parameterType="UserVo" resultType="UserVo">
+		SELECT
+			  USER_SEQ
+			, USER_ID
+			, PASSWORD
+			, NAME
+			, EMAIL
+			, PHONE
+			, CRE_DT
+			, UPD_DT
+		FROM USER
+	</select>
+	
+	<select id="selectUserById" parameterType="String" resultType="UserVo">
+		SELECT
+			  USER_SEQ
+			, USER_ID
+			, PASSWORD
+			, NAME
+			, EMAIL
+			, PHONE
+			, CRE_DT
+			, UPD_DT
+		FROM USER
+		WHERE 1=1
+		<if test = ' userId != null and userId != "" '>
+			AND USER_ID = #{userId}
+		</if>
+	</select>
+	
+	<select id="selectUserByIdIncludePassword" parameterType="String" resultMap="userResult">
+		SELECT
+			  USER_SEQ
+			, USER_ID
+			, PASSWORD
+			, NAME
+			, EMAIL
+			, PHONE
+			, CRE_DT
+			, UPD_DT
+		FROM USER
+		WHERE 1=1
+		<if test = ' userId != null and userId != "" '>
+			AND USER_ID = #{userId}
+		</if>
+	</select>
+	
+	<update id="updateUser" parameterType="UserVo">
+		UPDATE USER
+		<set>
+			<if test = ' password != null and password != "" '>
+				PASSWORD = #{password},
+			</if>
+			<if test = ' name != null and name != "" '>
+				NAME = #{name},
+			</if>
+			<if test = ' phone != null and phone != "" '>
+				PHONE = #{phone},
+			</if>
+		</set>
+		WHERE USER_ID = #{userId}
+	</update>
+	
+	
+</mapper>

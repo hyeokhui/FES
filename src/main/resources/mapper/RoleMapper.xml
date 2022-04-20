@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTDMapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ezfarm.fes.mapper.RoleMapper">
+
+	<select id="selectRoles" resultType="RoleVo">
+		SELECT * FROM ROLE
+	</select>
+
+	<select id="selectRolesByUserUserSeq" resultType="String">
+		SELECT
+			DISTINCT ROLE_CODE
+		FROM 
+			ROLE
+			LEFT OUTER JOIN USER_ROLE
+				ON ROLE.ROLE_SEQ = USER_ROLE.ROLE_SEQ
+			LEFT OUTER JOIN USER
+				ON USER.USER_SEQ = USER_ROLE.USER_SEQ
+		WHERE USER.USER_SEQ = #{userSeq}
+	</select>
+	
+	<insert id="insertRolesByUserSeq" parameterType="UserVo">
+		INSERT INTO USER_ROLE 
+		(
+			  ROLE_SEQ
+			, USER_SEQ
+		)
+		SELECT ROLE_SEQ, '${userSeq}'
+		FROM ROLE
+		WHERE ROLE_CODE IN
+		<foreach collection="role" index='index' item='vo' open="(" close=")" separator=",">
+			#{vo}
+		</foreach>
+	</insert>
+	
+	<delete id="deleteRolesByUserSeq" parameterType="UserVo">
+		DELETE FROM USER_ROLE WHERE 
+	  	USER_SEQ = (
+	  		SELECT DISTINCT USER_SEQ 
+	  		FROM USER 
+	  		WHERE USER_SEQ = #{userSeq}
+	  	)
+	</delete>
+
+</mapper>
